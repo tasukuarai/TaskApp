@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -44,6 +46,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, InputActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        final EditText mSearchCategory = (EditText)findViewById(R.id.category_search);
+        findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mSearchCategory.getText().toString().equals("")) {
+                    mTaskRealmResults = mRealm.where(Task.class)
+                            .equalTo("category", mSearchCategory.getText().toString())
+                            .findAll();
+                }else{
+                    mTaskRealmResults = mRealm.where(Task.class).findAll();
+                    mTaskRealmResults.sort("date", Sort.DESCENDING);
+                }
+
+                reloadListView();
             }
         });
 
@@ -132,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
             task.setTitle(mTaskRealmResults.get(i).getTitle());
             task.setContents(mTaskRealmResults.get(i).getContents());
             task.setDate(mTaskRealmResults.get(i).getDate());
+            task.setCategory(mTaskRealmResults.get(i).getCategory());
 
             taskArrayList.add(task);
         }
